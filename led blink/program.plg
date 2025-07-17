@@ -1,0 +1,49 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Project:</h2>
+D:\practice\led blink\program.uvproj
+Project File Date:  07/17/2025
+
+<h2>Output:</h2>
+Build target 'Target 1'
+assembling STARTUP.A51...
+compiling program.c...
+program.c(1): warning C318: can't open file 'reg.51'
+program.c(2): error C129: missing ';' before 'main'
+Target not created
+compiling program.c...
+program.c(1): warning C318: can't open file 'reg.51'
+program.c(2): error C129: missing ';' before 'main'
+program.c - 1 Error(s), 1 Warning(s).
+Build target 'Target 1'
+assembling STARTUP.A51...
+compiling program.c...
+program.c(2): error C129: missing ';' before 'main'
+Target not created
+Build target 'Target 1'
+assembling STARTUP.A51...
+compiling program.c...
+program.c(6): error C202: 'p2': undefined identifier
+Target not created
+Build target 'Target 1'
+assembling STARTUP.A51...
+compiling program.c...
+program.c(7): warning C206: 'delay': missing function-prototype
+program.c(7): error C267: 'delay': requires ANSI-style prototype
+program.c(14): error C231: 'delay': redefinition
+program.c(22): error C231: 'delay': redefinition
+Target not created
+Build target 'Target 1'
+assembling STARTUP.A51...
+compiling program.c...
+program.c(12): error C174: return-expression on void-function
+Target not created
+Build target 'Target 1'
+assembling STARTUP.A51...
+compiling program.c...
+linking...
+Program Size: data=9.0 xdata=0 code=74
+creating hex file from "program"...
+"program" - 0 Error(s), 0 Warning(s).

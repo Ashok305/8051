@@ -1,0 +1,14 @@
+#include<reg51.h>
+int arr[]={0xc0,0xf9,0xa4,0xb0,0x99,0x92,0x82,0xf8,0x80,0x98};
+void main()
+{
+
+  TMOD=0X05;
+  TH0=0X00;
+  TL0=0X00;
+  TR0=1;
+   while(1)
+ {
+   P2=arr[TL0];
+   }
+   }

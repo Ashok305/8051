@@ -1,0 +1,62 @@
+C51 COMPILER V9.53.0.0   PROGRAM                                                           07/19/2025 17:18:46 PAGE 1   
+
+
+C51 COMPILER V9.53.0.0, COMPILATION OF MODULE PROGRAM
+OBJECT MODULE PLACED IN program.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE program.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include <reg51.h>  // Include 8051 register definitions
+   2          
+   3          // Function Prototypes
+   4          void UART_Init();             // UART Initialization
+   5          void UART_Transmit(char ch); // Transmit one character
+   6          char UART_Receive();          // Receive one character
+   7          
+   8          // Main Function
+   9          void main() {
+  10   1          UART_Init();              // Step 1: Set up UART
+  11   1          UART_Transmit('h');       // Step 2: Send 'h' to terminal
+  12   1      
+  13   1          while(1) {
+  14   2              char receivedChar = UART_Receive(); // Step 3: Wait and get one char
+  15   2              UART_Transmit(receivedChar);        // Step 4: Send it back (echo)
+  16   2          }
+  17   1      }
+  18          
+  19          // Function to Initialize UART
+  20          void UART_Init() {
+  21   1          SCON = 0x50;   // Mode 1 (8-bit UART), REN=1 (Receiver enabled)
+  22   1          TMOD = 0x20;   // Timer1 in Mode 2 (8-bit auto-reload)
+  23   1          TH1 = 0xFD;    // 9600 baud rate for 11.0592MHz crystal
+  24   1          TR1 = 1;       // Start Timer1
+  25   1      }
+  26          
+  27          // Function to Transmit a Character
+  28          void UART_Transmit(char ch) {
+  29   1          SBUF = ch;         // Load character into Serial Buffer
+  30   1          while(TI == 0);    // Wait for transmission to complete
+  31   1          TI = 0;            // Clear the transmit flag for next use
+  32   1      }
+  33          
+  34          // Function to Receive a Character
+  35          char UART_Receive() {
+  36   1          while(RI == 0);    // Wait for character to be received
+  37   1          RI = 0;            // Clear receive flag
+  38   1          return SBUF;       // Return received character
+  39   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     46    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

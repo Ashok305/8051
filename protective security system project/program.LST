@@ -1,0 +1,152 @@
+C51 COMPILER V9.53.0.0   PROGRAM                                                           07/20/2025 17:29:55 PAGE 1   
+
+
+C51 COMPILER V9.53.0.0, COMPILATION OF MODULE PROGRAM
+OBJECT MODULE PLACED IN program.OBJ
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE program.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include <reg51.h>
+   2          #include <string.h>
+   3          #include "lcd.h"
+   4          
+   5          // Keypad pins
+   6          sbit R1 = P1^0;
+   7          sbit R2 = P1^1;
+   8          sbit R3 = P1^2;
+   9          sbit R4 = P1^3;
+  10          
+  11          sbit C1 = P1^4;
+  12          sbit C2 = P1^5;
+  13          sbit C3 = P1^6;
+  14          
+  15          // Outputs
+  16          sbit RE = P3^4;  // Relay
+  17          sbit G = P3^5;   // Green LED
+  18          sbit R = P3^6;   // Red LED
+  19          
+  20          // Variables
+  21          char actual_pass[] = "1234";
+  22          char entered_pass[5];
+  23          int n = 0;
+  24          int wrong_attempts = 0;
+  25          
+  26          // Delay function (approximate 1 ms)
+  27          void delay_ms(unsigned int ms) {
+  28   1          unsigned int i, j;
+  29   1          for(i = 0; i < ms; i++)
+  30   1              for(j = 0; j < 1275; j++);
+  31   1      }
+  32          
+  33          void main() {
+  34   1          lcd_init();
+  35   1          lcd_string("Enter Pass:");
+  36   1          lcd_cmd(0xC0); // Move cursor to 2nd line
+  37   1      
+  38   1          RE = 0; G = 0; R = 0; // All OFF
+  39   1      
+  40   1          while(1) {
+  41   2              if(n < 4) {
+  42   3                  // Row 1
+  43   3                  R1 = 0; R2 = R3 = R4 = 1;
+  44   3                  if(C1 == 0) { lcd_data('1'); entered_pass[n++] = '1'; while(C1==0); delay_ms(100); }
+  45   3                  if(C2 == 0) { lcd_data('2'); entered_pass[n++] = '2'; while(C2==0); delay_ms(100); }
+  46   3                  if(C3 == 0) { lcd_data('3'); entered_pass[n++] = '3'; while(C3==0); delay_ms(100); }
+  47   3      
+  48   3                  // Row 2
+  49   3                  R2 = 0; R1 = R3 = R4 = 1;
+  50   3                  if(C1 == 0) { lcd_data('4'); entered_pass[n++] = '4'; while(C1==0); delay_ms(100); }
+  51   3                  if(C2 == 0) { lcd_data('5'); entered_pass[n++] = '5'; while(C2==0); delay_ms(100); }
+  52   3                  if(C3 == 0) { lcd_data('6'); entered_pass[n++] = '6'; while(C3==0); delay_ms(100); }
+  53   3      
+  54   3                  // Row 3
+  55   3                  R3 = 0; R1 = R2 = R4 = 1;
+C51 COMPILER V9.53.0.0   PROGRAM                                                           07/20/2025 17:29:55 PAGE 2   
+
+  56   3                  if(C1 == 0) { lcd_data('7'); entered_pass[n++] = '7'; while(C1==0); delay_ms(100); }
+  57   3                  if(C2 == 0) { lcd_data('8'); entered_pass[n++] = '8'; while(C2==0); delay_ms(100); }
+  58   3                  if(C3 == 0) { lcd_data('9'); entered_pass[n++] = '9'; while(C3==0); delay_ms(100); }
+  59   3      
+  60   3                  // Row 4
+  61   3                  R4 = 0; R1 = R2 = R3 = 1;
+  62   3                  if(C1 == 0) {
+  63   4                      // * = Backspace
+  64   4                      if(n > 0) {
+  65   5                          n--;
+  66   5                          lcd_cmd(0xC0 + n);  // Move cursor to previous char
+  67   5                          lcd_data(' ');
+  68   5                          lcd_cmd(0xC0 + n);  // Move cursor back again
+  69   5                      }
+  70   4                      while(C1==0); delay_ms(200);
+  71   4                  }
+  72   3                  if(C2 == 0) { lcd_data('0'); entered_pass[n++] = '0'; while(C2==0); delay_ms(200); }
+  73   3                  if(C3 == 0) { /* # = No action */ while(C3==0); delay_ms(200); }
+  74   3              }
+  75   2      
+  76   2              if(n == 4) {
+  77   3                  entered_pass[4] = '\0';
+  78   3      
+  79   3                  if(strcmp(entered_pass, actual_pass) == 0) {
+  80   4                      RE = 1; G = 1; R = 0;
+  81   4                      lcd_cmd(0x01);
+  82   4                      lcd_cmd(0x80);
+  83   4                      lcd_string("Access Granted");
+  84   4                      delay_ms(100);
+  85   4                      lcd_cmd(0x01);
+  86   4                      lcd_cmd(0x80);
+  87   4                      lcd_string("Enter Pass:");
+  88   4                      lcd_cmd(0xC0);
+  89   4                      RE = 0; G = 0; R = 0;
+  90   4                      wrong_attempts = 0;
+  91   4                  } else {
+  92   4                      wrong_attempts++;
+  93   4                      RE = 0; G = 0; R = 1;
+  94   4                      lcd_cmd(0x01);
+  95   4                      lcd_cmd(0x80);
+  96   4                      lcd_string("Access Denied");
+  97   4                      delay_ms(100);
+  98   4      
+  99   4                      if(wrong_attempts < 3) {
+ 100   5                          lcd_cmd(0x01);
+ 101   5                          lcd_cmd(0x80);
+ 102   5                          lcd_string("Try Again");
+ 103   5                          delay_ms(100);
+ 104   5                          lcd_cmd(0x01);
+ 105   5                          lcd_cmd(0x80);
+ 106   5                          lcd_string("Enter Pass:");
+ 107   5                          lcd_cmd(0xC0);
+ 108   5                      } else {
+ 109   5                          lcd_cmd(0x01);
+ 110   5                          lcd_cmd(0x80);
+ 111   5                          lcd_string("Please Wait");
+ 112   5                          lcd_cmd(0xC0);
+ 113   5                          lcd_string("few Seconds");
+ 114   5                          delay_ms(2500);
+ 115   5                          lcd_cmd(0x01);
+ 116   5                          lcd_cmd(0x80);
+ 117   5                          lcd_string("Enter Pass:");
+C51 COMPILER V9.53.0.0   PROGRAM                                                           07/20/2025 17:29:55 PAGE 3   
+
+ 118   5                          lcd_cmd(0xC0);
+ 119   5                          wrong_attempts = 0;
+ 120   5                      }
+ 121   4                  }
+ 122   3                  n = 0;
+ 123   3              }
+ 124   2          }
+ 125   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    830    ----
+   CONSTANT SIZE    =     75    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     14       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
